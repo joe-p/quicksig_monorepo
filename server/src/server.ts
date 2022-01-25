@@ -28,10 +28,10 @@ app.post('/generate', function (req, res) {
   const data = req.body
   const hash = crypto.createHash('sha256').update(JSON.stringify(data.metadata)).digest('hex')
 
-  if(data.hash == hash) {
+  if (data.hash === hash) {
     redisClient.set(hash, JSON.stringify(data))
     redisClient.expire(hash, 3600)
-  
+
     res.status(200).send(hash)
   } else {
     res.sendStatus(500)

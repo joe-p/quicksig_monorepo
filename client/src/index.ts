@@ -9,25 +9,25 @@ interface QuickSigData {
       algodToken: string,
       algodPort: string,
     },
-  
+
     auth?: {
       isAuth: boolean,
       user: string,
       service: string,
       description: string,
     },
-  
+
     post?: {
-      onSigned?: string, 
+      onSigned?: string,
       onComplete?: string,
     },
-  
+
     b64Txn: string,
     sigAddress: string,
     userAddress: string
   },
 
-  sig: string, 
+  sig: string,
   hash: string,
 }
 
