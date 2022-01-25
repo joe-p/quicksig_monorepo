@@ -1,0 +1,46 @@
+<h1>QuickSig</h1>
+<h2>Verification</h2>
+<table class="table table-striped">
+    <tr>
+        <td>Hash</td>
+        <td id='hash-verification'>Pending...</td>
+        <td id='hash-value'>Pending...</td>
+
+    </tr>
+    <tr>
+        <td>Signature</td>
+        <td id='sig-verification'>Pending...</td>
+        <td id='sig-value'>Pending...</td>
+    </tr>
+</table>
+{{#if metadata.auth.isAuth}}
+    <h2>Proof of Ownership Request</h2>
+    
+    <p>{{metadata.auth.description}}</p>
+    <table class="table table-striped">
+        <tr>
+            <td>Service</td>
+            <td>{{metadata.auth.service}}</td>
+        </tr>
+        <tr>
+            <td>Service Address</td>
+            <td>{{metadata.sigAddress}}</td>
+        </tr>
+        <tr>
+            <td>User</td>
+            <td>{{metadata.auth.user}}</td>
+        </tr>
+        <tr>
+            <td>User Address</td>
+            <td>{{metadata.userAddress}}</td>
+        </tr>
+    </table>
+{{/if}}
+
+<h2>Transaction Info</h2>
+<div id='txn'>Loading...</div>
+
+<h2>Raw Data</h2>
+<div id='raw'>{{dataString}}</div>
+
+<script src="index.js"></script>

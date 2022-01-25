@@ -1,0 +1,13 @@
+{
+    "files.exclude": {
+        "**/.eslintrc.js": true,
+        "**/dist/": true,
+        "**/node_modules/": true,
+        "**/package*.json": true,
+        "**/tsconfig.json": true,
+        "yarn.lock": true, 
+        ".gitignore": true,
+        "**/webpack.config.js": true,
+        "**/frontend_dist": true
+    }
+}
