@@ -39,7 +39,7 @@ async function generate() {
     },
 
     post: {
-      onSigned: null, 
+      onSigned: 'https://httpbin.org/post', 
       onComplete: null,
     },
 

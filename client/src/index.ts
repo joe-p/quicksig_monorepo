@@ -70,6 +70,15 @@ function verifyHash (metadata: Object, hash: string) {
   }
 }
 
+async function postData (url: string, data: any) {
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+
+  return response.json()
+}
+
 const rawData = document.getElementById('raw').innerHTML
 const data = JSON.parse(rawData) as QuickSigData
 const txn = algosdk.decodeUnsignedTransaction(Buffer.from(data.metadata.b64Txn, 'base64'))
@@ -78,3 +87,12 @@ document.getElementById('txn').innerHTML = generateTable(JSON.parse(txn.toString
 
 verifySig(data.hash, data.sig)
 verifyHash(data.metadata, data.hash)
+
+const post = data.metadata.post
+
+// TODO: Once signing is implemented, call this after the txn is signed (and send the signed txn)
+if (post && post.onSigned) {
+  postData(post.onSigned, { signedB64Txn: data.metadata.b64Txn }).then(data => {
+    console.log(data)
+  })
+}
