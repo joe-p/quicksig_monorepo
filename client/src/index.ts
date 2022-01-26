@@ -1,5 +1,6 @@
 import algosdk from 'algosdk'
 import crypto from 'crypto'
+import MyAlgoConnect from '@randlabs/myalgo-connect'
 
 interface QuickSigData {
   metadata: {
@@ -51,9 +52,11 @@ function verifySig (hash: string, sig: string) {
   if (algosdk.verifyBytes(hashBuffer, sigBuffer, data.metadata.sigAddress)) {
     document.getElementById('sig-verification').innerHTML = 'Verified!'
     document.getElementById('sig-value').innerHTML = data.metadata.sigAddress
+    return true
   } else {
     document.getElementById('sig-verification').innerHTML = 'Verification FAILED!'
     document.getElementById('sig-value').innerHTML = 'Unknown'
+    return false
   }
 }
 
@@ -65,8 +68,10 @@ function verifyHash (metadata: Object, hash: string) {
 
   if (pathHash === realHash) {
     document.getElementById('hash-verification').innerHTML = 'Verified!'
+    return true
   } else {
     console.log(pathHash, realHash)
+    return false
   }
 }
 
@@ -79,20 +84,52 @@ async function postData (url: string, data: any) {
   return response.json()
 }
 
+function txnSigned (signedTxn: Uint8Array) {
+  const post = data.metadata.post
+
+  const b64SignedTxn = Buffer.from(signedTxn).toString('base64')
+
+  if (post && post.onSigned) {
+    postData(post.onSigned, { b64SignedTxn: b64SignedTxn }).then(data => {
+      console.log(data)
+    })
+  }
+}
+
+async function connectMyAlgo () {
+  const settings = {
+    shouldSelectOneAccount: true,
+    openManager: false
+  }
+
+  // TODO: verify address connected is address in metadata
+  await myAlgoConnect.connect(settings)
+}
+
+async function signMyAlgo () {
+  const signedTxn = (await myAlgoConnect.signTransaction(txn.toByte())).blob
+
+  txnSigned(signedTxn)
+}
+
+function init () {
+  document.getElementById('txn').innerHTML = generateTable(JSON.parse(txn.toString()))
+
+  if (verifySig(data.hash, data.sig) && verifyHash(data.metadata, data.hash)) {
+    const myAlgoConnectBtn = document.getElementById('my-algo-connect') as HTMLButtonElement
+    myAlgoConnectBtn.addEventListener('click', connectMyAlgo)
+    myAlgoConnectBtn.disabled = false
+
+    const myAlgoSignBtn = document.getElementById('my-algo-sign') as HTMLButtonElement
+    myAlgoSignBtn.addEventListener('click', signMyAlgo)
+    myAlgoSignBtn.disabled = false
+  }
+}
+
+const myAlgoConnect = new MyAlgoConnect()
+
 const rawData = document.getElementById('raw').innerHTML
 const data = JSON.parse(rawData) as QuickSigData
 const txn = algosdk.decodeUnsignedTransaction(Buffer.from(data.metadata.b64Txn, 'base64'))
 
-document.getElementById('txn').innerHTML = generateTable(JSON.parse(txn.toString()))
-
-verifySig(data.hash, data.sig)
-verifyHash(data.metadata, data.hash)
-
-const post = data.metadata.post
-
-// TODO: Once signing is implemented, call this after the txn is signed (and send the signed txn)
-if (post && post.onSigned) {
-  postData(post.onSigned, { signedB64Txn: data.metadata.b64Txn }).then(data => {
-    console.log(data)
-  })
-}
+init()

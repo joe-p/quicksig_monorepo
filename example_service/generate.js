@@ -8,15 +8,15 @@ const token = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 const algodClient = new algosdk.Algodv2(token, server, 4001)
 
 const account = algosdk.generateAccount()
-const userAccount = algosdk.generateAccount()
+const userAddress = 'D34DXBU2LDSFAYXD2WTGD3FVT2CFCQBTLHMFESUDC237SHSVODQNATP264'
 
 async function generate() {
   const suggestedParams = await algodClient.getTransactionParams().do()
 
   const payObj = {
     suggestedParams: { ...suggestedParams, lastRound: 1, firstRound: 2 },
-    from: userAccount.addr,
-    to: userAccount.addr,
+    from: userAddress,
+    to: userAddress,
     amount: 0
   }
 
@@ -45,7 +45,7 @@ async function generate() {
 
     b64Txn: b64Txn,
     sigAddress: account.addr,
-    userAddress: userAccount.addr,
+    userAddress: userAddress,
   }
 
   const hash = crypto.createHash('sha256').update(JSON.stringify(metadata)).digest('hex')
