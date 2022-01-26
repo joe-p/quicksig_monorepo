@@ -48,9 +48,9 @@ namespace QuickSig {
       this.data = JSON.parse(rawData)
       this.txn = algosdk.decodeUnsignedTransaction(Buffer.from(this.data.metadata.b64Txn, 'base64'))
 
-      document.getElementById('txn').innerHTML = this.generateTable(JSON.parse(this.txn.toString()))
+      this.generateTxnTable()
 
-      if (this.verifySig(this.data.hash, this.data.sig) && this.verifyHash(this.data.metadata, this.data.hash)) {
+      if (this.verifySig() && this.verifyHash()) {
         const myAlgoConnectBtn = document.getElementById('my-algo-connect') as HTMLButtonElement
         myAlgoConnectBtn.addEventListener('click', () => { this.connectMyAlgo() })
         myAlgoConnectBtn.disabled = false
@@ -61,9 +61,9 @@ namespace QuickSig {
       }
     }
 
-    generateTable (obj: Object) {
+    generateTxnTable () {
       let tableString = '<table class="table table-striped">'
-      for (const [key, value] of Object.entries(obj)) {
+      for (const [key, value] of Object.entries(JSON.parse(this.txn.toString()))) {
         tableString += '<tr>'
         tableString += `<td>${key}</td>`
         tableString += `<td>${value}</td>`.replace('[object Object]', '')
@@ -71,12 +71,12 @@ namespace QuickSig {
       }
       tableString += '</table>'
 
-      return tableString
+      document.getElementById('txn').innerHTML = tableString
     }
 
-    verifySig (hash: string, sig: string) {
-      const hashBuffer = Buffer.from(hash, 'hex')
-      const sigBuffer = Buffer.from(sig, 'base64')
+    verifySig () {
+      const hashBuffer = Buffer.from(this.data.hash, 'hex')
+      const sigBuffer = Buffer.from(this.data.sig, 'base64')
 
       if (algosdk.verifyBytes(hashBuffer, sigBuffer, this.data.metadata.sigAddress)) {
         document.getElementById('sig-verification').innerHTML = 'Verified!'
@@ -89,7 +89,7 @@ namespace QuickSig {
       }
     }
 
-    verifyHash (metadata: Object, hash: string) {
+    verifyHash () {
       const pathHash = window.location.pathname.substring(1)
       const realHash = crypto.createHash('sha256').update(JSON.stringify(this.data.metadata)).digest('hex')
 
