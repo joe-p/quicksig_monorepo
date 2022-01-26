@@ -44,30 +44,37 @@ function generateTable (obj: Object) {
   return tableString
 }
 
+function verifySig (hash: string, sig: string) {
+  const hashBuffer = Buffer.from(hash, 'hex')
+  const sigBuffer = Buffer.from(sig, 'base64')
+
+  if (algosdk.verifyBytes(hashBuffer, sigBuffer, data.metadata.sigAddress)) {
+    document.getElementById('sig-verification').innerHTML = 'Verified!'
+    document.getElementById('sig-value').innerHTML = data.metadata.sigAddress
+  } else {
+    document.getElementById('sig-verification').innerHTML = 'Verification FAILED!'
+    document.getElementById('sig-value').innerHTML = 'Unknown'
+  }
+}
+
+function verifyHash (metadata: Object, hash: string) {
+  const pathHash = window.location.pathname.substring(1)
+  const realHash = crypto.createHash('sha256').update(JSON.stringify(data.metadata)).digest('hex')
+
+  document.getElementById('hash-value').innerHTML = realHash
+
+  if (pathHash === realHash) {
+    document.getElementById('hash-verification').innerHTML = 'Verified!'
+  } else {
+    console.log(pathHash, realHash)
+  }
+}
+
 const rawData = document.getElementById('raw').innerHTML
-
 const data = JSON.parse(rawData) as QuickSigData
-
 const txn = algosdk.decodeUnsignedTransaction(Buffer.from(data.metadata.b64Txn, 'base64'))
 
 document.getElementById('txn').innerHTML = generateTable(JSON.parse(txn.toString()))
 
-const hashBuffer = Buffer.from(data.hash, 'hex')
-const sigBuffer = Buffer.from(data.sig, 'base64')
-
-if (algosdk.verifyBytes(hashBuffer, sigBuffer, data.metadata.sigAddress)) {
-  document.getElementById('sig-verification').innerHTML = 'Verified!'
-  document.getElementById('sig-value').innerHTML = data.metadata.sigAddress
-} else {
-  document.getElementById('sig-verification').innerHTML = 'Verification FAILED!'
-  document.getElementById('sig-value').innerHTML = 'Unknown'
-}
-
-const pathHash = window.location.pathname.substring(1)
-const realHash = crypto.createHash('sha256').update(JSON.stringify(data.metadata)).digest('hex')
-document.getElementById('hash-value').innerHTML = realHash
-if (pathHash === realHash) {
-  document.getElementById('hash-verification').innerHTML = 'Verified!'
-} else {
-  console.log(pathHash, realHash)
-}
+verifySig(data.hash, data.sig)
+verifyHash(data.metadata, data.hash)

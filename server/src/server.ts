@@ -21,7 +21,11 @@ app.set('views', path.join(__dirname, '../views'))
 
 app.get('/:hash', async function (req, res) {
   const data = await redisClient.get(req.params.hash)
-  res.render('quicksig', { metadata: JSON.parse(data).metadata, dataString: data })
+  if (!data) {
+    res.send('This hash does not exist!')
+  } else {
+    res.render('quicksig', { metadata: JSON.parse(data).metadata, dataString: data })
+  }
 })
 
 app.post('/generate', function (req, res) {
