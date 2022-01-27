@@ -3,6 +3,7 @@ import path from 'path'
 import crypto from 'crypto'
 import * as redis from 'redis'
 import { engine } from 'express-handlebars'
+import cors from 'cors'
 
 const redisClient = redis.createClient({
   url: 'redis://localhost:6379'
@@ -18,8 +19,9 @@ app.use(express.static(path.join(__dirname, '../../client/dist')))
 app.engine('handlebars', engine())
 app.set('view engine', 'handlebars')
 app.set('views', path.join(__dirname, '../views'))
+app.use(cors())
 
-app.get('/:hash', async function (req, res) {
+app.get('/:hash', cors({ origin: 'http://localhost:3001' }), async function (req, res) {
   const data = await redisClient.get(req.params.hash)
   if (!data) {
     res.send('This hash does not exist!')

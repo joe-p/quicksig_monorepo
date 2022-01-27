@@ -107,6 +107,10 @@ namespace QuickSig {
     async postData (url: string, data: any) {
       const response = await fetch(url, {
         method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(data)
       })
 
@@ -117,9 +121,11 @@ namespace QuickSig {
       const post = this.data.metadata.post
 
       const b64SignedTxn = Buffer.from(signedTxn).toString('base64')
+      const postData = { b64SignedTxn: b64SignedTxn, data: this.data }
 
       if (post && post.onSigned) {
-        this.postData(post.onSigned, { b64SignedTxn: b64SignedTxn }).then(data => {
+        this.postData(post.onSigned, postData).then(data => {
+          // TODO: Show this response to the user somewhere
           console.log(data)
         })
       }
