@@ -19,9 +19,18 @@ app.use(express.static(path.join(__dirname, '../../client/dist')))
 app.engine('handlebars', engine())
 app.set('view engine', 'handlebars')
 app.set('views', path.join(__dirname, '../views'))
-app.use(cors())
 
-app.get('/:hash', cors({ origin: 'http://localhost:3001' }), async function (req, res) {
+const getCors = async (req: express.Request, callback: Function) => {
+  const data = await redisClient.get(req.params.hash)
+  if (!data) {
+    callback(null, { origin: false })
+  } else {
+    console.log(JSON.parse(data).metadata.post.base)
+    callback(null, { origin: JSON.parse(data).metadata.post.base + '/*' })
+  }
+}
+
+app.get('/:hash', cors(getCors), async function (req, res) {
   const data = await redisClient.get(req.params.hash)
   if (!data) {
     res.send('This hash does not exist!')

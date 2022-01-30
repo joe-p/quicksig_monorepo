@@ -20,6 +20,7 @@ namespace QuickSig {
   interface PostData {
     onSigned?: string,
     onComplete?: string,
+    base: string,
   }
 
   interface MetaData {
