@@ -25,7 +25,6 @@ const getCors = async (req: express.Request, callback: Function) => {
   if (!data) {
     callback(null, { origin: false })
   } else {
-    console.log(JSON.parse(data).metadata.post.base)
     callback(null, { origin: JSON.parse(data).metadata.post.base + '/*' })
   }
 }

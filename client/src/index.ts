@@ -106,7 +106,6 @@ namespace QuickSig {
         document.getElementById('hash-verification').innerHTML = 'Verified!'
         return true
       } else {
-        console.log(pathHash, realHash)
         return false
       }
     }
