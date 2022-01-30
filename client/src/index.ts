@@ -64,9 +64,15 @@ namespace QuickSig {
     generateTxnTable () {
       let tableString = '<table class="table table-striped">'
       for (const [key, value] of Object.entries(JSON.parse(this.txn.toString()))) {
+        let tableValue = JSON.stringify(value)
+
+        if (key === 'note') {
+          tableValue = Buffer.from(Object.values(value) as Array<number>).toString()  
+        }
+
         tableString += '<tr>'
         tableString += `<td>${key}</td>`
-        tableString += `<td>${value}</td>`.replace('[object Object]', '')
+        tableString += `<td>${tableValue}</td>`
         tableString += '</tr>'
       }
       tableString += '</table>'
